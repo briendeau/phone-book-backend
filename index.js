@@ -7,6 +7,7 @@ app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cors())
 
+
 let entries = [
     { 
       "id": "1",
@@ -105,10 +106,11 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
-
+app.use(express.static("dist"));
 
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
