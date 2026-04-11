@@ -4,11 +4,7 @@ const app = express()
 const cors = require('cors')
 
 app.use(express.json())
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
-app.use(morgan(':body'))
-
-
-
+app.use(morgan('tiny'))
 app.use(cors())
 
 let entries = [
@@ -50,9 +46,11 @@ app.get('/info', (request, response) => {
  `)
 })
 
+const sameId = (a, b) => String(a) === String(b)
+
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const person = entries.find(person => person.id === id)
+  const person = entries.find((person) => sameId(person.id, id))
   if (person) {
     response.json(person)
   } else {
@@ -62,8 +60,30 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  entries = entries.filter(person => person.id !== id)
+  entries = entries.filter((person) => !sameId(person.id, id))
   response.status(204).end()
+})
+
+app.put('/api/persons/:id', (request, response) => {
+  const id = request.params.id
+  const body = request.body
+  if (!body.name || !body.number) {
+    return response.status(400).json({ error: 'name or number is missing' })
+  }
+  const person = entries.find((p) => sameId(p.id, id))
+  if (!person) {
+    return response.status(404).end()
+  }
+  // Use String(id) so we never treat the same row as "another" (e.g. 1 vs "1").
+  const nameTakenByOther = entries.some(
+    (p) => p.name === body.name && !sameId(p.id, id)
+  )
+  if (nameTakenByOther) {
+    return response.status(400).json({ error: 'name must be unique' })
+  }
+  const updated = { ...person, name: body.name, number: body.number }
+  entries = entries.map((p) => (sameId(p.id, id) ? updated : p))
+  response.json(updated)
 })
 
 app.post('/api/persons', (request, response) => {
