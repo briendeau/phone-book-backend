@@ -6,15 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --watch index.js",
-    "start": "node index.js"
-    
+    "start": "node index.js",
+    "build:ui": "rm -rf dist && cd ../part2-notes-frontend && npm run build && cp -r dist ../phone-book-backend",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongoose": "^9.4.1",
     "morgan": "^1.10.1"
   }
 }
