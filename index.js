@@ -9,11 +9,6 @@ app.use(morgan('tiny'))
 
 
 
-const password = process.argv[2];
-
-
-
-
 // const entries = [
 //     { 
 //       "id": "1",
